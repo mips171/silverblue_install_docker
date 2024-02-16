@@ -13,10 +13,24 @@ add_user_to_docker_group() {
     reboot
 }
 
+ask_enable_docker_service() {
+    echo "Would you like to start and enable Docker? [y/N]"
+    read -r response
+    if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+        systemctl start docker
+        systemctl enable docker
+        echo "Docker service started and enabled."
+    else
+        echo "Skipping Docker service start and enable."
+    fi
+}
+
+
 # Check if Docker is installed
 if command -v docker &> /dev/null; then
     echo "Docker is already installed. Proceeding to add user to Docker group..."
     add_user_to_docker_group
+    ask_enable_docker_service
 else
     # Add Docker CE repository
     cat <<EOF > /etc/yum.repos.d/docker.repo
